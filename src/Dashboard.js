@@ -2,9 +2,9 @@ import { useEffect, useState } from 'react';
 import { Button, FormControl, InputLabel, Input } from '@mui/material';
 import './App.css';
 import Todo from './Todo';
-import {db} from './firebase';
+import { db } from './firebase';
 import firebase from 'firebase';
-import {useNavigate} from 'react-router-dom'
+import { useNavigate } from 'react-router-dom'
 
 function Dashboard() {
 
@@ -18,15 +18,17 @@ function Dashboard() {
 
   // this funtion fires when clicking on button
   const addTodo = (event) => {
-    event.preventDefault() //this stops refresh
     db.collection('todos').add({
-      todo: input,
+      title: input,
       desc: description,
       timestamp: firebase.firestore.FieldValue.serverTimestamp()
     })
-    setTodos([...todos, input,description])
+    setTodos([...todos, input, description])
     setInput('') //clears the previous input
     setDescription('')
+    setTimeout(()=> {
+      document.location.reload()
+    },100)
   }
 
   const handleLogout = () => {
@@ -37,11 +39,14 @@ function Dashboard() {
   useEffect(() => {
     db.collection('todos').orderBy('timestamp', 'desc').onSnapshot(snapshot => {
       console.log(snapshot.docs.map(doc => doc.data()));
-      setTodos(snapshot.docs.map(doc => ({ id: doc.id, todo: doc.data().todo,desc: doc.data().desc })))
+      setTodos(snapshot.docs.map(doc => ({ id: doc.id, title: doc.data().title, desc: doc.data().desc })))
     })
   }, [])
   return (
     <div className="home">
+      <div className='logoutbtn'>
+        <Button variant="contained" color='error' onClick={handleLogout}>Log out</Button>
+      </div>
       <h1>Todo</h1>
       <form>
         <FormControl>
@@ -54,14 +59,16 @@ function Dashboard() {
       <input style={{ width: '250px', height: '20px', textAlign: 'center', marginTop: '10px' }}
         value={filterTodo}
         onChange={event => setFilterTodo(event.target.value)}
-        placeholder='search todos'
+        placeholder='search todos by title'
         type='text'
       />
-      <Button onClick={handleLogout}>Log out</Button>
+      <br />
+      <br />
       <ul>
-        {todos.map(todo => (
-          <Todo key={todo.id} todo={todo} />
-        ))}
+        {todos.filter(todo => todo.title.toLowerCase().includes(filterTodo))
+          .map(todo => (
+            <Todo key={todo.id} todo={todo} />
+          ))}
       </ul>
     </div>
   );

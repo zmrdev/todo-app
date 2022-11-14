@@ -63,3 +63,44 @@
   justify-content: center;
   align-items: center;
 }
+.logoutbtn{
+  display: flex;
+  justify-content: end;
+  align-items: flex-end;
+  padding-right: 17px;
+}
+.todo-container{
+ 
+}
+
+.todo-list {
+  /* display: flex;
+  border: 1px solid grey;
+  padding: 10px;
+  margin: 10px auto; */
+  
+  /* align-items: ; */
+  padding: 20px;
+  display: flex;
+  align-items: center;
+  max-width: 600px;
+  margin: 10px auto;
+  border: 1px solid #f2f2f2;
+  justify-content: space-between;
+
+}
+.danger{
+  background-color: rgb(206, 70, 70);
+  color: beige;
+  padding: 5px 8px;
+  border-color: #f1356d;
+}
+.danger:hover{
+  background-color: rgb(226, 41, 41);
+  color: rgb(255, 255, 255);
+  border-color: red;
+  
+}
+.child p{
+  color: #333435;
+}

@@ -1,19 +1,17 @@
-import { List, ListItem, ListItemAvatar, ListItemText } from '@mui/material'
 import React from 'react'
-import {db} from './firebase'
+import { db } from './firebase'
 import DeleteForeverIcon from '@mui/icons-material/DeleteForever';
 
 function Todo({ todo }) {
-  
+
   return (
-    <List>
-      <ListItem>
-        <ListItemAvatar>
-        </ListItemAvatar>
-        <ListItemText primary={todo.todo} secondary={todo.desc}/>
-      </ListItem>
-      <DeleteForeverIcon onClick={event => db.collection('todos').doc(todo.id).delete()}/>
-    </List>
+    <div className='todo-container'>
+      <div className='todo-list'>
+        <h1 className='child'>{todo.title}</h1>
+        <p className='child'>{todo.desc}</p>
+        <button className='danger child' onClick={event => db.collection('todos').doc(todo.id).delete()}>Delete todo</button>
+      </div>
+    </div>
   )
 }
 
