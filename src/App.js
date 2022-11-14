@@ -1,55 +1,50 @@
-import { useEffect, useState } from 'react';
-import { Button, FormControl, InputLabel, Input } from '@mui/material';
 import './App.css';
-import Todo from './Todo';
-import db from './firebase';
+import NavBar from './NavBar';
+import{BrowserRouter as Router,Routes,Route} from 'react-router-dom'
+import Login from './Login';
+import Dashboard from './Dashboard';
+import { useState } from 'react';
 import firebase from 'firebase';
-
 function App() {
 
-  const [todos, setTodos] = useState([])
-  const [input, setInput] = useState('')
-  console.log('input', input);
-
-  // this funtion fires when clicking on button
-  const addTodo = (event) => {
-    event.preventDefault() //this stops refresh
-    console.log('addTodo is working');
-    db.collection('todos').add({
-      todo: input,
-      timestamp: firebase.firestore.FieldValue.serverTimestamp()
-    })
-    setTodos([...todos, input])
-    setInput('') //clears the previous input
+  const [isUserLoggedIn,setIsUserLoggedIn] = useState(true)
+  firebase.auth().onAuthStateChanged((user)=>{
+    if(user){
+      setIsUserLoggedIn(true)
+    }
+    else{
+      setIsUserLoggedIn(false)
+    }
+  })
+  if(isUserLoggedIn === true){
+    return (
+      <Router>
+      <div className="App">
+        <NavBar/>
+        <div className='content'>
+          <Routes>
+            <Route path='/dashboard' element={<Dashboard/>}> </Route>
+          </Routes>
+        </div>
+      </div>
+      </Router>
+    );  
   }
+  else{
+    return (
+      <Router>
+      <div className="App">
+        <NavBar/>
+        <div className='content'>
+          <Routes>
+            <Route path='/' element={<Login/>}> </Route>
+          </Routes>
+        </div>
+      </div>
+      </Router>
+    );
 
-  // listening to db and fetch new todos when they get added/removed
-  useEffect(()=>{
-    db.collection('todos').orderBy('timestamp','desc').onSnapshot(snapshot => {
-      console.log(snapshot.docs.map(doc => doc.data()));
-      setTodos(snapshot.docs.map(doc => doc.data().todo))
-    })
-  },[])
-  return (
-    <div className="App">
-      <h1>Hello zameer</h1>
-      <form>
-        <FormControl>
-          <InputLabel >Write a todo</InputLabel>
-          <Input type="text" value={input} onChange={event => setInput(event.target.value)} />
-        </FormControl>
-        <Button disabled={!input} onClick={addTodo} type='submit'
-          variant="contained" color='primary'>Add todos</Button>
-
-      </form>
-
-      <ul>
-        {todos.map(todo => (
-          <Todo text={todo} />
-        ))}
-      </ul>
-    </div>
-  );
+  }
 }
 
 export default App;
