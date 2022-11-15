@@ -1,9 +1,11 @@
 import { useEffect, useState } from 'react';
-import { Button, FormControl, InputLabel, Input } from '@mui/material';
+import { Button, FormControl, Input } from '@mui/material';
 import './App.css';
 import Todo from './Todo';
 import { db } from './firebase';
-import firebase from 'firebase';
+import { auth } from './firebase';
+import { query, collection, onSnapshot, addDoc, serverTimestamp, orderBy, } from 'firebase/firestore';
+import { signOut } from 'firebase/auth';
 import { useNavigate } from 'react-router-dom'
 
 function Dashboard() {
@@ -17,30 +19,28 @@ function Dashboard() {
   console.log('input', input);
 
   // this funtion fires when clicking on button
-  const addTodo = (event) => {
-    db.collection('todos').add({
+  const addTodo = async (event) => {
+    event.preventDefault()
+    await addDoc(collection(db, 'todos'), {
       title: input,
       desc: description,
-      timestamp: firebase.firestore.FieldValue.serverTimestamp()
+      timestamp: serverTimestamp()
     })
-    setTodos([...todos, input, description])
     setInput('') //clears the previous input
     setDescription('')
-    setTimeout(()=> {
-      document.location.reload()
-    },100)
   }
 
   const handleLogout = () => {
-    firebase.auth().signOut()
+    signOut(auth)
     navigate('/')
   }
   // listening to db and fetch new todos when they get added/removed
   useEffect(() => {
-    db.collection('todos').orderBy('timestamp', 'desc').onSnapshot(snapshot => {
-      console.log(snapshot.docs.map(doc => doc.data()));
-      setTodos(snapshot.docs.map(doc => ({ id: doc.id, title: doc.data().title, desc: doc.data().desc })))
-    })
+    const q = query(collection(db, 'todos'), orderBy('timestamp', 'desc'))
+    const unSubscribe = onSnapshot(q, (snapshot) => {
+      setTodos(snapshot.docs.map(doc => ({ ...doc.data(), id: doc.id })));
+    });
+    return unSubscribe
   }, [])
   return (
     <div className="home">

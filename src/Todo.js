@@ -1,6 +1,6 @@
 import React from 'react'
 import { db } from './firebase'
-import DeleteForeverIcon from '@mui/icons-material/DeleteForever';
+import { deleteDoc, doc } from 'firebase/firestore';
 
 function Todo({ todo }) {
 
@@ -9,7 +9,7 @@ function Todo({ todo }) {
       <div className='todo-list'>
         <h1 className='child'>{todo.title}</h1>
         <p className='child'>{todo.desc}</p>
-        <button className='danger child' onClick={event => db.collection('todos').doc(todo.id).delete()}>Delete todo</button>
+        <button className='danger child' onClick={() => deleteDoc(doc(db, 'todos', todo.id))}>Delete todo</button>
       </div>
     </div>
   )

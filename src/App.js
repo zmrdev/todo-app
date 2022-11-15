@@ -4,11 +4,12 @@ import { BrowserRouter as Router, Routes, Route } from 'react-router-dom'
 import Login from './Login';
 import Dashboard from './Dashboard';
 import { useState } from 'react';
-import firebase from 'firebase';
+import { auth } from './firebase'
+import { onAuthStateChanged } from 'firebase/auth';
 function App() {
 
   const [isUserLoggedIn, setIsUserLoggedIn] = useState(true)
-  firebase.auth().onAuthStateChanged((user) => {
+  onAuthStateChanged(auth, user => {
     if (user) {
       setIsUserLoggedIn(true)
     }
